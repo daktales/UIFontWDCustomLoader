@@ -1,12 +1,12 @@
 UIFontWDCustomLoader
 ======
-You can use UIFontWDCustomLoader category to load any compatible font into your iOS projects without messing with plist or strange magic.
+You can use UIFontWDCustomLoader category to load any compatible font into your iOS projects without messing with plist, font unknown names or strange magic.
 
 The only things you'll have to know are your font filename and this library name. 
 ##Usage
 ###Adding font to Project
-1. Drag'n drop your font into Xcode project
-2. Check "Target Membership" of your font files
+1. Drag'n drop your font into Xcode project, selecting "Add to Target" when prompted.
+2. Check "Target Membership" of your added font files (just to be sure).
 
 If you can't see a font, check under `Build Phases > Copy Bundle Resource`: you must see the font filename listed here.
 
@@ -15,9 +15,12 @@ If you can't see a font, check under `Build Phases > Copy Bundle Resource`: you 
     #import "UIFont+WDCustomLoader.h"
     …
     UIFont *myCustomFont = [UIFont customFontOfSize:18.0f withName:@"Lato-Hairline" withExtension:@"ttf"];
-    …
-    
-*(Replace name and extension with yours)*
+    …    
+
+*(Replace filename and extension with yours)*
+
+Fonts will be "saved" with postscript name so you can't use `[UIFont fontWithName:<filename> withSize:<size>]` to get them. 
+**Use only this category's method or define a new one yourself.**
 
 ##Install
 

@@ -19,8 +19,9 @@
  Get UIFont object for the selected font
  
  Note:
- You can't use fonts with same names and different extensions (like "Monaco.ttf" 
- and "Monaco.otf"). Only the first font will be loaded.
+ You can't use fonts with same postscript name or same filename (but different
+ extensions). This library will return nil on errors so default font is used
+ and you will be notified by log.
  
  @param size Font size
  @param name Font filename without extension
