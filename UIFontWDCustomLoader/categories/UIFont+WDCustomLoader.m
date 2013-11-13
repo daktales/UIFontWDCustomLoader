@@ -10,13 +10,56 @@
 #import "UIFont+WDCustomLoader.h"
 #import <CoreText/CoreText.h>
 
+// Activate/Deactive logging only in Xcode
+#ifdef DEBUG
+#define UIFontWDCustomLoaderDLog(fmt, ...) NSLog((@"%s [Line %d] " fmt), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__);
+#else
+#define UIFontWDCustomLoaderDLog(...)
+#endif
+
 @implementation UIFont (Custom)
+
+/**
+ Read font postscript name directly from file url
+ 
+ @param fontURL Font file URL
+ */
++ (NSString *)fontNameFromFontUrl:(NSURL *)fontURL{
+    // Font name
+    NSString *postScriptName = nil;
+    
+    // Read data
+    NSData *fontData = [NSData dataWithContentsOfURL:fontURL];
+    
+    // Check data creation
+    if (fontData) {
+        
+        // Load font
+        CGDataProviderRef fontDataProvider = CGDataProviderCreateWithCFData((CFDataRef)fontData);
+        CGFontRef loadedFont = CGFontCreateWithDataProvider(fontDataProvider);
+        
+        // Check font
+        if (loadedFont != NULL){
+            
+            // Read name
+            postScriptName = (NSString *)CFBridgingRelease(CGFontCopyPostScriptName(loadedFont));
+            
+        }
+        
+        // Release
+        CGFontRelease(loadedFont);
+        CGDataProviderRelease(fontDataProvider);
+    }
+    
+    return postScriptName;
+}
+
 + (UIFont *) customFontOfSize:(CGFloat)size withName:(NSString *)name withExtension:(NSString *)extension{
     // Define syncronization structures
     static dispatch_once_t onceLock;
-    static dispatch_once_t onceFontSet;
+    static dispatch_once_t onceFontDict;
     static NSLock *fontSetLock = nil;
-    static NSMutableSet *registeredFontSet = nil;
+    static NSMutableDictionary *registeredFontDictionary = nil;
     
     // Return value
     UIFont *returnFont = nil;
@@ -28,41 +71,65 @@
     
     // Begin critical section
     [fontSetLock lock];{
-        // Once set creation
-        dispatch_once(&onceFontSet, ^{
-            registeredFontSet = [[NSMutableSet alloc] init];
+        // Once dict creation
+        dispatch_once(&onceFontDict, ^{
+            registeredFontDictionary = [[NSMutableDictionary alloc] init];
         });
         
         // Test for registered fonts
-        if ([registeredFontSet containsObject:name]){
+        if ([registeredFontDictionary objectForKey:name]){
             
-            returnFont = [UIFont fontWithName:name size:size];
+            returnFont = [UIFont fontWithName:registeredFontDictionary[name] size:size];
             
         } else {
             
             // Get url for font resource
-            NSURL *fontUrl = [[NSBundle mainBundle] URLForResource:name withExtension:extension];
+            NSURL *fontURL = [[NSBundle mainBundle] URLForResource:name withExtension:extension];
             
             // Test url
-            if (fontUrl){
+            if (fontURL){
                 
-                // Begin font registration
-                CFErrorRef error;
-                BOOL registrationResult = YES;
+                // Get font name
+                NSString *fontName = [[self class] fontNameFromFontUrl:fontURL];
                 
-                registrationResult = CTFontManagerRegisterFontsForURL((__bridge CFURLRef)fontUrl, kCTFontManagerScopeProcess, &error);
-                
-                // If registration went ok
-                if (registrationResult){
+                // Check if font has a name (font validation too)
+                if (fontName){
                     
-                    [registeredFontSet addObject:name];
-                    returnFont = [UIFont fontWithName:name size:size];
+                    // Check if font is not registered
+                    if ([UIFont fontWithName:fontName size:size] == nil){
+                        
+                        // Begin font registration
+                        CFErrorRef error;
+                        BOOL registrationResult = YES;
+                        
+                        registrationResult = CTFontManagerRegisterFontsForURL((__bridge CFURLRef)fontURL, kCTFontManagerScopeProcess, &error);
+                        
+                        // If registration went ok
+                        if (registrationResult){
+                            
+                            [registeredFontDictionary setObject:fontName forKey:name];
+                            returnFont = [UIFont fontWithName:fontName size:size];
+                            
+                        } else {
+                            
+                            UIFontWDCustomLoaderDLog(@"Error with font registration: %@",error);
+                            
+                        }
+                    } else {
+                        
+                        UIFontWDCustomLoaderDLog(@"Error with font registration: Font '%@' already registered",fontName);
+                        
+                    }
                     
                 } else {
                     
-                    NSLog(@"Error with font registration: %@",error);
+                    UIFontWDCustomLoaderDLog(@"Error with font registration: File '%@' is not a Font",fontURL);
                     
                 }
+            } else {
+                
+                UIFontWDCustomLoaderDLog(@"Error with font registration: File '%@.%@' not exists",name,extension);
+                
             }
         }
     }
