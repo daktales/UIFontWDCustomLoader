@@ -2,7 +2,9 @@ UIFontWDCustomLoader
 ======
 You can use UIFontWDCustomLoader category to load any compatible font into your iOS projects without messing with plist, font unknown names or strange magic.
 
-The only things you'll have to know are your font filename and this library name. 
+The only things you'll have to know are your font filenames and this library name.
+
+You can also use this library to load fonts at runtime. 
 ##Usage
 ###Adding font to Project
 1. Drag'n drop your font into Xcode project, selecting "Add to Target" when prompted.
@@ -13,18 +15,61 @@ If you can't see a font, check under `Build Phases > Copy Bundle Resource`: you 
 ###Using font
 
     #import "UIFont+WDCustomLoader.h"
-    …
+    
+####One time setup (Explicit registration):
+
+    // FONT COLLECTION (TTC OR OTC)
+    
+    // URL for file 'Chalkboard.ttc'
+    NSURL *chalkboardFontURL = [[NSBundle mainBundle] URLForResource:@"Chalkboard" withExtension:@"ttc"]];
+    
+    // fontPostScriptNames will become @[@"Chalkboard",@"Chalkboard-Bold"] and collection will be registered.
+    // On iOS < 7.0 you will get an empty list.
+    NSArray *fontPostScriptNames = [UIFont registerFontFromURL:chalkboardFontURL];
+    
+    // then you can do
+    UIFont *chalkboardFont = [UIFont fontWithName:@"Chalkboard" size:18.0f];
+
+or    
+    
+    // SINGLE FONT (TTF OR OTF)
+    
+     // URL for file 'Lato-Hairline.ttf'
+    NSURL *latoHairlineFontURL = [[NSBundle mainBundle] URLForResource:@"Lato-Hairline" withExtension:@"ttf"]];
+    
+    // fontPostScriptNames will become @[@"Lato-Hairline"] and font will be registered
+    NSArray *fontPostScriptNames = [UIFont registerFontFromURL:latoHairlineFontURL];
+    
+    // then
+    UIFont *latoHairlineFont = [UIFont fontWithName:@"Lato-Hairline" size:18.0f];
+    
+    // or
+    UIFont *latoHairlineFont = [UIFont customFontWithURL:latoHairlineFontURL size:18.0f];
+    
+    // *deprecated*
     UIFont *myCustomFont = [UIFont customFontOfSize:18.0f withName:@"Lato-Hairline" withExtension:@"ttf"];
-    …    
 
-*(Replace filename and extension with yours)*
+####No setup (Implicit registration)
 
-Fonts will be "saved" with postscript name so you can't use `[UIFont fontWithName:<filename> withSize:<size>]` to get them. 
-**Use only this category's method or define a new one yourself.**
+     // SINGLE FONT (TTF OR OTF)
+    
+     // URL for file 'Lato-Hairline.ttf'
+    NSURL *latoHairlineFontURL = [[NSBundle mainBundle] URLForResource:@"Lato-Hairline" withExtension:@"ttf"]];
+
+    UIFont *latoHairlineFont = [UIFont customFontWithURL:latoHairlineFontURL size:18.0f];
+    
+    // *deprecated*
+    UIFont *myCustomFont = [UIFont customFontOfSize:18.0f withName:@"Lato-Hairline" withExtension:@"ttf"];
+
+*NOTE: font registration will be made only on first method call*
+
+##Prerequisites
+UIFontWDCustomLoader requires:
+
+- ARC
+- Deployment target greater or equal to iOS 4.1
 
 ##Install
-
-
 
 ###Basic
 Simply download it from [here](https://github.com/daktales/UIFontWDCustomLoader/archive/master.zip) and include it in your project manually.
@@ -42,4 +87,4 @@ in your root folder of your repository.
 This code is distributed under the terms and conditions of the [MIT license](LICENSE). 
 
 ##Thanks
-The entire idea behind this library came after I see how FlatUIKit loads its fonts. So a big thanks over them. [Link](https://github.com/Grouper/FlatUIKit)
+The entire idea behind this library came after I see how FlatUIKit loads its fonts. So a big thanks to them. [Link](https://github.com/Grouper/FlatUIKit)
