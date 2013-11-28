@@ -142,7 +142,7 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
                             fontPSNames = nil;
                         }
                         
-                    } else { // [userProvidedFonts count] <= 0
+                    } else { // [fontPSNames count] <= 0
                         UIFontWDCustomLoaderDLog(@"Warning with font registration: All fonts in '%@' are already registered",fontURL);
                     }
                     
@@ -235,7 +235,7 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
     NSSet *singleFontValidExtensions = [NSSet setWithArray:@[@"ttf",@"otf"]];
     
     if (![singleFontValidExtensions containsObject:[fontURL pathExtension]]){
-        UIFontWDCustomLoaderDLog(@"Font collections not supported by this method");
+        UIFontWDCustomLoaderDLog(@"Only ttf or otf files are supported by this method");
         return nil;
     }
     
