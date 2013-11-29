@@ -4,43 +4,45 @@
 //  Created by Walter Da Col on 10/17/13.
 //  Copyright (c) 2013 Walter Da Col (walter.dacol<at>gmail.com)
 //
-//  Inspired by FlatUIKit font code (https://github.com/Grouper/FlatUIKit)
-//
 
 #import <UIKit/UIKit.h>
 
 /**
- You can use UIFont+WDCustomLoader category to load custom fonts for your
+ You can use `UIFont+WDCustomLoader` category to load custom fonts for your
  application without worring about plist or real font names.
  */
 @interface UIFont (WDCustomLoader)
 
+/// @name Implicit registration and font loading
+
 /**
- *Will be Deprecated*
- Calls *customFontWithURL:size* method
+ Get `UIFont` object for the selected font file.
  
+ This method calls `+customFontWithURL:size`.
+ 
+ @deprecated
+ @see +customFontWithURL:size: method
  @param size Font size
  @param name Font filename without extension
  @param extension Font filename extension (@"ttf" and @"otf" are supported)
- @return UIFont object or nil on errors
+ @return `UIFont` object or `nil` on errors
  */
 + (UIFont *) customFontOfSize:(CGFloat)size withName:(NSString *)name withExtension:(NSString *)extension;
 
 /**
- Get UIFont object for the selected font (ttf, otf)
+ Get `UIFont` object for the selected font file (*.ttf or *.otf files).
  
  The first call of this method will register the font using 
- *registerFontFromURL* method.
+ `+registerFontFromURL:` method.
  
- Note:
- This library will return nil on errors so default font is used.
- (you will be notified by log)
- 
+ @see +registerFontFromURL: method
  @param fontURL Font file absolute url
  @param size Font size
- @return UIFont object or nil on errors
+ @return `UIFont` object or `nil` on errors
  */
 + (UIFont *) customFontWithURL:(NSURL *)fontURL size:(CGFloat)size;
+
+/// @name Explicit registration
 
 /**
  Allow custom fonts registration.
@@ -50,8 +52,8 @@
  registered and you will see a warning log.
  
  @param fontURL Font file absolute url
- @return An array of postscript name which represent the file's font(s) or nil
- on errors. (with iOS < 7 as target you will see an empty array for collections)
+ @return An array of postscript name which represent the file's font(s) or `nil`
+ on errors. (With iOS < 7 as target you will see an empty array for collections)
  */
 + (NSArray *) registerFontFromURL:(NSURL *)fontURL;
 

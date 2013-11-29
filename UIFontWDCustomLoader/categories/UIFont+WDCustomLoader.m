@@ -4,8 +4,6 @@
 //  Created by Walter Da Col on 10/17/13.
 //  Copyright (c) 2013 Walter Da Col (walter.dacol<at>gmail.com)
 //
-//  Inspired by FlatUIKit font code (https://github.com/Grouper/FlatUIKit)
-//
 
 #import "UIFont+WDCustomLoader.h"
 #import <CoreText/CoreText.h>
@@ -31,8 +29,9 @@ static CGFloat const kSizePlaceholder = 1.0f;
 static NSMutableDictionary *appRegisteredCustomFonts = nil;
 
 /**
- Check if device support font collections with ease
- ( >= iOS 7)
+ Check features for full font collections support
+ 
+ @return YES if all features are supported
  */
 + (BOOL) deviceHasFullSupportForFontCollections {
     
@@ -41,9 +40,11 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
 }
 
 /**
- Actual font(s) registration from file
+ Inner method for font(s) registration from a file
  
- @param fontURL Font URL
+ @param fontURL A font URL
+ 
+ @return Registration result
  */
 + (BOOL) registerFromURL:(NSURL *)fontURL {
     
@@ -62,9 +63,11 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
 }
 
 /**
- Actual font registration from already loaded font
+ Inner method for font registration from a graphic font.
  
- @param fontRef A loaded CGFont
+ @param fontRef A CGFontRef
+ 
+ @return Registration result
  */
 + (BOOL) registerFromCGFont:(CGFontRef)fontRef {
 
