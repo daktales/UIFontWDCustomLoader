@@ -34,12 +34,10 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
  Check if device support font collections with ease
  ( >= iOS 7)
  */
-+ (BOOL) deviceHasFullSupportForFontCollections{
-    BOOL result = YES;
++ (BOOL) deviceHasFullSupportForFontCollections {
     
-    result = result && (CTFontManagerCreateFontDescriptorsFromURL != NULL); // 10.6 or 7.0
+    return (CTFontManagerCreateFontDescriptorsFromURL != NULL); // 10.6 or 7.0
     
-    return result;
 }
 
 /**
@@ -47,15 +45,15 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
  
  @param fontURL Font URL
  */
-+ (BOOL) registerFromURL:(NSURL *)fontURL{
++ (BOOL) registerFromURL:(NSURL *)fontURL {
     
     CFErrorRef error;
     BOOL registrationResult = YES;
     
     registrationResult = CTFontManagerRegisterFontsForURL((__bridge CFURLRef)fontURL, kCTFontManagerScopeProcess, &error);
     
-    if (!registrationResult){
-        UIFontWDCustomLoaderDLog(@"Error with font registration: %@",error);
+    if (!registrationResult) {
+        UIFontWDCustomLoaderDLog(@"Error with font registration: %@", error);
         CFRelease(error);
         return NO;
     }
@@ -68,15 +66,15 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
  
  @param fontRef A loaded CGFont
  */
-+ (BOOL) registerFromCGFont:(CGFontRef)fontRef{
++ (BOOL) registerFromCGFont:(CGFontRef)fontRef {
 
     CFErrorRef error;
     BOOL registrationResult = YES;
     
     registrationResult = CTFontManagerRegisterGraphicsFont(fontRef, &error);
     
-    if (!registrationResult){
-        UIFontWDCustomLoaderDLog(@"Error with font registration: %@",error);
+    if (!registrationResult) {
+        UIFontWDCustomLoaderDLog(@"Error with font registration: %@", error);
         CFRelease(error);
         return NO;
     }
@@ -85,7 +83,7 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
     
 }
 
-+ (NSArray *) registerFontFromURL:(NSURL *)fontURL{
++ (NSArray *) registerFontFromURL:(NSURL *)fontURL {
     // Dictionary creation
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -97,31 +95,31 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
     
     
     // Critical section
-    @synchronized(appRegisteredCustomFonts){
+    @synchronized(appRegisteredCustomFonts) {
         
         // Check if this library knows this url
         fontPSNames = [[appRegisteredCustomFonts objectForKey:fontURL] copy];
         
-        if (fontPSNames == nil){
+        if (fontPSNames == nil) {
             
             // Check features
-            if ([UIFont deviceHasFullSupportForFontCollections]){
+            if ([UIFont deviceHasFullSupportForFontCollections]) {
                 
                 // Retrieve font descriptors from ttf, otf, ttc and otc files
                 NSArray *fontDescriptors = (__bridge_transfer NSArray *)(CTFontManagerCreateFontDescriptorsFromURL((__bridge CFURLRef)fontURL));
                 
                 // Check errors
-                if (fontDescriptors){
+                if (fontDescriptors) {
                     
                     // Check how many fonts are already registered (or have the
                     // same name of another font)
                     NSMutableArray *verifiedFontPSNames = [NSMutableArray new];
                     
-                    for (NSDictionary *fontDescriptor in fontDescriptors){
+                    for (NSDictionary *fontDescriptor in fontDescriptors) {
                         NSString *fontPSName = [fontDescriptor objectForKey:@"NSFontNameAttribute"];
                         
-                        if (fontPSName){
-                            if ([UIFont fontWithName:fontPSName size:kSizePlaceholder]){
+                        if (fontPSName) {
+                            if ([UIFont fontWithName:fontPSName size:kSizePlaceholder]) {
                                 UIFontWDCustomLoaderDLog(@"Warning with font registration: Font '%@' already registered",fontPSName);
                             }
                             [verifiedFontPSNames addObject:fontPSName];
@@ -131,30 +129,33 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
                     fontPSNames = [NSArray arrayWithArray:verifiedFontPSNames];
                     
                     // At least one
-                    if ([fontPSNames count] > 0){
+                    if ([fontPSNames count] > 0) {
                         
                         // If registration went ok
-                        if ([UIFont registerFromURL:fontURL]){
+                        if ([UIFont registerFromURL:fontURL]) {
                             // Add url to this library
-                            [appRegisteredCustomFonts setObject:fontPSNames forKey:fontURL];
+                            [appRegisteredCustomFonts setObject:fontPSNames
+                                                         forKey:fontURL];
                             
                         } else {
                             fontPSNames = nil;
                         }
                         
                     } else { // [fontPSNames count] <= 0
-                        UIFontWDCustomLoaderDLog(@"Warning with font registration: All fonts in '%@' are already registered",fontURL);
+                        UIFontWDCustomLoaderDLog(@"Warning with font registration: All fonts in '%@' are already registered", fontURL);
                     }
                     
                 } else { // CTFontManagerCreateFontDescriptorsFromURL fail
-                    UIFontWDCustomLoaderDLog(@"Error with font registration: File '%@' is not a Font",fontURL);
+                    UIFontWDCustomLoaderDLog(@"Error with font registration: File '%@' is not a Font", fontURL);
                     fontPSNames = nil;
                 }
             } else { // [UIFont deviceHasFullSupportForFontCollections] fail
                 
                 // Read data
                 NSError *error;
-                NSData *fontData = [NSData dataWithContentsOfURL:fontURL options:NSDataReadingUncached error:&error];
+                NSData *fontData = [NSData dataWithContentsOfURL:fontURL
+                                                         options:NSDataReadingUncached
+                                                           error:&error];
                 
                 // Check data creation
                 if (fontData) {
@@ -164,29 +165,30 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
                     CGFontRef loadedFont = CGFontCreateWithDataProvider(fontDataProvider);
                     
                     // Check font
-                    if (loadedFont != NULL){
+                    if (loadedFont != NULL) {
                         
                         // Prior to iOS7 is not easy to retrieve names from font collections
                         // But is possible to register collections
-                        NSSet *singleFontValidExtensions = [NSSet setWithArray:@[@"ttf",@"otf"]];
+                        NSSet *singleFontValidExtensions = [NSSet setWithArray:@[@"ttf", @"otf"]];
                         
-                        if ([singleFontValidExtensions containsObject:[fontURL pathExtension]]){
+                        if ([singleFontValidExtensions containsObject:[fontURL pathExtension]]) {
                             // Read name
                             fontPSNames = @[(__bridge_transfer NSString *)(CGFontCopyPostScriptName(loadedFont))];
                             
                             // Check if registration is required
-                            if ([UIFont fontWithName:fontPSNames[0] size:kSizePlaceholder] == nil){
+                            if ([UIFont fontWithName:fontPSNames[0] size:kSizePlaceholder] == nil) {
                                 
                                 // If registration went ok
-                                if ([UIFont registerFromCGFont:loadedFont]){
+                                if ([UIFont registerFromCGFont:loadedFont]) {
                                     // Add url to this library
-                                    [appRegisteredCustomFonts setObject:fontPSNames forKey:fontURL];
+                                    [appRegisteredCustomFonts setObject:fontPSNames
+                                                                 forKey:fontURL];
                                     
                                 } else {
                                     fontPSNames = nil;
                                 }
                             } else {
-                                UIFontWDCustomLoaderDLog(@"Warning with font registration: All fonts in '%@' are already registered",fontURL);
+                                UIFontWDCustomLoaderDLog(@"Warning with font registration: All fonts in '%@' are already registered", fontURL);
                             }
                             
                         } else {
@@ -197,9 +199,10 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
                             
                             // Revert to url registration which allow collections
                             // If registration went ok
-                            if ([UIFont registerFromURL:fontURL]){
+                            if ([UIFont registerFromURL:fontURL]) {
                                 // Add url to this library
-                                [appRegisteredCustomFonts setObject:fontPSNames forKey:fontURL];
+                                [appRegisteredCustomFonts setObject:fontPSNames
+                                                             forKey:fontURL];
                                 
                             } else {
                                 fontPSNames = nil;
@@ -207,7 +210,7 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
                         }
                         
                     } else { // CGFontCreateWithDataProvider fail
-                        UIFontWDCustomLoaderDLog(@"Error with font registration: File '%@' is not a Font",fontURL);
+                        UIFontWDCustomLoaderDLog(@"Error with font registration: File '%@' is not a Font", fontURL);
                         fontPSNames = nil;
                     }
                     
@@ -215,7 +218,7 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
                     CGFontRelease(loadedFont);
                     CGDataProviderRelease(fontDataProvider);
                 } else {
-                    UIFontWDCustomLoaderDLog(@"Error with font registration: URL '%@' cannot be read with error: %@",fontURL,error);
+                    UIFontWDCustomLoaderDLog(@"Error with font registration: URL '%@' cannot be read with error: %@", fontURL, error);
                     fontPSNames = nil;
                 }
 
@@ -223,36 +226,35 @@ static NSMutableDictionary *appRegisteredCustomFonts = nil;
         
         }
         
-        
     }
 
     return fontPSNames;
 }
 
-+ (UIFont *) customFontWithURL:(NSURL *)fontURL size:(CGFloat)size{
++ (UIFont *) customFontWithURL:(NSURL *)fontURL size:(CGFloat)size {
     
     // Only single font with this method
-    NSSet *singleFontValidExtensions = [NSSet setWithArray:@[@"ttf",@"otf"]];
+    NSSet *singleFontValidExtensions = [NSSet setWithArray:@[@"ttf", @"otf"]];
     
-    if (![singleFontValidExtensions containsObject:[fontURL pathExtension]]){
+    if (![singleFontValidExtensions containsObject:[fontURL pathExtension]]) {
         UIFontWDCustomLoaderDLog(@"Only ttf or otf files are supported by this method");
         return nil;
     }
     
     NSArray *fontPSNames = [UIFont registerFontFromURL:fontURL];
 
-    if (fontPSNames == nil){
-        UIFontWDCustomLoaderDLog(@"Invalid Font URL: %@",fontURL);
+    if (fontPSNames == nil) {
+        UIFontWDCustomLoaderDLog(@"Invalid Font URL: %@", fontURL);
         return nil;
     }
-    if ([fontPSNames count] != 1){
+    if ([fontPSNames count] != 1) {
         UIFontWDCustomLoaderDLog(@"Font collections not supported by this method");
         return nil;
     }
     return [UIFont fontWithName:fontPSNames[0] size:size];
 }
 
-+ (UIFont *) customFontOfSize:(CGFloat)size withName:(NSString *)name withExtension:(NSString *)extension{
++ (UIFont *) customFontOfSize:(CGFloat)size withName:(NSString *)name withExtension:(NSString *)extension {
     // Get url for font resource
     NSURL *fontURL = [[[NSBundle mainBundle] URLForResource:name withExtension:extension] absoluteURL];
     

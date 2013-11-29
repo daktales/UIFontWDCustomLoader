@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 
 /**
- You can use UIFont+WDCustomLoader category to load custom font for your 
+ You can use UIFont+WDCustomLoader category to load custom fonts for your
  application without worring about plist or real font names.
  */
 @interface UIFont (WDCustomLoader)
@@ -27,15 +27,14 @@
 + (UIFont *) customFontOfSize:(CGFloat)size withName:(NSString *)name withExtension:(NSString *)extension;
 
 /**
- Get UIFont object for the selected font (ttf,otf)
+ Get UIFont object for the selected font (ttf, otf)
  
  The first call of this method will register the font using 
  *registerFontFromURL* method.
  
  Note:
- You can't use fonts with same postscript name.
- This library will return nil on errors so default font is used
- and you will be notified by log.
+ This library will return nil on errors so default font is used.
+ (you will be notified by log)
  
  @param fontURL Font file absolute url
  @param size Font size
@@ -47,8 +46,8 @@
  Allow custom fonts registration.
  
  With this method you can load all supported font file: ttf, otf, ttc and otc.
- Font which are already present will not be register and you will see a warning
- log.
+ Font that are already registered, with this library or by system, will not be 
+ registered and you will see a warning log.
  
  @param fontURL Font file absolute url
  @return An array of postscript name which represent the file's font(s) or nil

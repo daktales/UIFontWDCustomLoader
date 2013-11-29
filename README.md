@@ -75,6 +75,7 @@ UIFontWDCustomLoader requires:
 
 - ARC
 - Deployment target greater or equal to iOS 4.1
+- CoreText Framework
 
 This library has been tested with: iOS 5, 6 and 7
 
