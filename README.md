@@ -25,18 +25,18 @@ If you can't see a font, check under `Build Phases > Copy Bundle Resource`: you 
 ```objective-c
 /* FONT COLLECTION FILE (TTC OR OTC) */
 
-// Create an NSURL for your font file: 'Chalkboard.ttc'
-NSURL *chalkboardFontURL = [[NSBundle mainBundle] URLForResource:@"Chalkboard" withExtension:@"ttc"]];
+// Create an NSURL for your font file: 'Lao MN.ttc'
+NSURL *chalkboardFontURL = [[NSBundle mainBundle] URLForResource:@"Lao MN" withExtension:@"ttc"]];
 
 // Do the registration.
 NSArray *fontPostScriptNames = [UIFont registerFontFromURL:chalkboardFontURL];
 
-// If everything went ok, fontPostScriptNames will become @[@"Chalkboard",@"Chalkboard-Bold"] 
+// If everything went ok, fontPostScriptNames will become @[@"LaoMN",@"LaoMN-Bold"] 
 // and collection will be registered.
 // (Note: On iOS < 7.0 you will get an empty array)
 
 // Then, anywhere in your code, you can do
-UIFont *chalkboardFont = [UIFont fontWithName:@"Chalkboard" size:18.0f];
+UIFont *chalkboardFont = [UIFont fontWithName:@"LaoMN" size:18.0f];
 ```
 
 or    
