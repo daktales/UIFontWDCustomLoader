@@ -26,17 +26,17 @@ If you can't see a font, check under `Build Phases > Copy Bundle Resource`: you 
 /* FONT COLLECTION FILE (TTC OR OTC) */
 
 // Create an NSURL for your font file: 'Lao MN.ttc'
-NSURL *chalkboardFontURL = [[NSBundle mainBundle] URLForResource:@"Lao MN" withExtension:@"ttc"]];
+NSURL *laoFontURL = [[NSBundle mainBundle] URLForResource:@"Lao MN" withExtension:@"ttc"]];
 
 // Do the registration.
-NSArray *fontPostScriptNames = [UIFont registerFontFromURL:chalkboardFontURL];
+NSArray *fontPostScriptNames = [UIFont registerFontFromURL:laoFontURL];
 
 // If everything went ok, fontPostScriptNames will become @[@"LaoMN",@"LaoMN-Bold"] 
 // and collection will be registered.
 // (Note: On iOS < 7.0 you will get an empty array)
 
 // Then, anywhere in your code, you can do
-UIFont *chalkboardFont = [UIFont fontWithName:@"LaoMN" size:18.0f];
+UIFont *laoFont = [UIFont fontWithName:@"LaoMN" size:18.0f];
 ```
 
 or    
@@ -101,7 +101,18 @@ You have the canonical `git submodule` option. Simply issue
 in your root folder of your repository.
 
 ###Cocoapods
-Nearly done.
+You can use [CocoaPods](http://guides.cocoapods.org/using/getting-started.html) to install this library.
+
+In your Xcode project folder create (or modify) a 'podfile' file with:
+
+```ruby
+platform :ios
+pod 'UIFontWDCustomLoader', '~> 0.1.0'
+```
+
+Then launch `pod install` in the same folder (using console).
+
+Now you **must** open your project by `.workspace` file.
 
 ##License
 This code is distributed under the terms and conditions of the [MIT license](LICENSE). 
