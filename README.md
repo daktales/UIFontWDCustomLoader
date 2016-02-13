@@ -100,7 +100,7 @@ You have the canonical `git submodule` option. Simply issue
 
 in your root folder of your repository.
 
-###Cocoapods
+###CocoaPods
 You can use [CocoaPods](http://guides.cocoapods.org/using/getting-started.html) to install this library.
 
 In your Xcode project folder create (or modify) a 'podfile' file with:
