@@ -7,20 +7,20 @@ You can use UIFontWDCustomLoader category to load any compatible font into your 
 The only things you'll have to know are your font filenames and this library name.
 
 You can also use this library to load new fonts after app installation. 
-##Usage
-###Adding font to Project
+## Usage
+### Adding font to Project
 1. Drag'n drop your font into Xcode project, selecting "Add to Targets" when prompted.
 2. Check "Target Membership" of your added font files (File inspector on the right).
 
 If you can't see a font, check under `Build Phases > Copy Bundle Resource`: you must see the font filename listed here.
 
-###Using font
+### Using font
 
 ```objective-c
 #import "UIFont+WDCustomLoader.h"
 ```
 
-####One time setup (Explicit registration):
+#### One time setup (Explicit registration):
 
 ```objective-c
 /* FONT COLLECTION FILE (TTC OR OTC) */
@@ -63,7 +63,7 @@ UIFont *latoHairlineFont = [UIFont customFontWithURL:latoHairlineFontURL size:18
 UIFont *myCustomFont = [UIFont customFontOfSize:18.0f withName:@"Lato-Hairline" withExtension:@"ttf"];
 ```
 
-####No setup (Implicit registration)
+#### No setup (Implicit registration)
 
 ```objective-c
 /* SINGLE FONT (TTF OR OTF) */
@@ -80,7 +80,7 @@ UIFont *myCustomFont = [UIFont customFontOfSize:18.0f withName:@"Lato-Hairline" 
 
 **NOTE:** *Font registration will be made on first* `[ UIFont customFont… ]` *method call.*
 
-##Prerequisites
+## Prerequisites
 UIFontWDCustomLoader requires:
 
 - ARC
@@ -89,18 +89,18 @@ UIFontWDCustomLoader requires:
 
 This library has been tested with: iOS 5, 6 and 7
 
-##Install
-###Basic
+## Install
+### Basic
 Simply download it from [here](https://github.com/daktales/UIFontWDCustomLoader/archive/master.zip) and include it in your project manually.
 
-###GIT submodule
+### GIT submodule
 You have the canonical `git submodule` option. Simply issue
 
     git submodule add https://github.com/daktales/UIFontWDCustomLoader.git <path>
 
 in your root folder of your repository.
 
-###CocoaPods
+### CocoaPods
 You can use [CocoaPods](http://guides.cocoapods.org/using/getting-started.html) to install this library.
 
 In your Xcode project folder create (or modify) a 'podfile' file with:
@@ -114,8 +114,8 @@ Then launch `pod install` in the same folder (using console).
 
 Now you **must** open your project by `.workspace` file.
 
-##License
+## License
 This code is distributed under the terms and conditions of the [MIT license](LICENSE). 
 
-##Thanks
+## Thanks
 The entire idea behind this library came after I see how FlatUIKit loads its fonts. So a big thanks to them. [Link](https://github.com/Grouper/FlatUIKit)
